@@ -1,4 +1,3 @@
-
 <template>
   <div>
     <el-container>
@@ -15,7 +14,7 @@
           <el-menu-item index="/home/about">
             关于
           </el-menu-item>
-          <div class="right">
+          <div class="right" v-if="isLogin !== true">
             <el-button type="text"
               ><i class="el-icon-tickets"></i>写文章</el-button
             >
@@ -23,12 +22,37 @@
               >登录·注册</el-button
             >
           </div>
+          <div class="right" v-if="isLogin === true">
+            <el-dropdown
+              split-button
+              type="primary"
+              size="small"
+              @click="Write"
+            >
+              写文章
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>分享</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+            <div>
+              <el-dropdown @command="handleCommand">
+                <el-avatar
+                  src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                ></el-avatar>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item command="write">写文章</el-dropdown-item>
+                  <el-dropdown-item command="b">管理</el-dropdown-item>
+                  <el-dropdown-item command="layout" @click="loginout"
+                    >登出</el-dropdown-item
+                  >
+                </el-dropdown-menu>
+              </el-dropdown>
+            </div>
+          </div>
         </el-menu>
       </el-header>
       <el-main>
         <el-card class="box-card">
-          <!-- {{ $store.state.counter }} -->
-          <!-- {{ isLogin }} -->
           <router-view></router-view>
         </el-card>
       </el-main>
@@ -69,7 +93,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -111,8 +135,9 @@ export default {
   },
   // and more functionality to discover
   computed: {
-    ...mapState({
-      isLogin: state => state.isLogin //使用ES6的箭头函数来给count赋值
+    ...mapState("user", {
+      //前面三个 . 不是多余的！！ 第一个参数是模块名称（就是js文件名），后面是{变量名：state => 回调函数 }  这个在后面还会讲一下
+      isLogin: state => state.isLogin
     })
   },
   methods: {
@@ -124,9 +149,10 @@ export default {
         const { data } = await this.$axios.get(
           "admin/getUser/" + this.loginForm.username
         );
-        console.log(data)
+        console.log(data);
         if (data.password === this.loginForm.password) {
           this.$message.success("登录成功!");
+          Promise.all([this.SET_isLogin(true)]);
         } else {
           this.$message.error("登录失败!");
         }
@@ -137,7 +163,24 @@ export default {
     },
     loginDialogClosed() {
       this.$refs.loginFormRef.resetFields();
-    }
+    },
+    handleCommand(command) {
+      if (command === "write") {
+        this.$router.push({ path: '/home/write'}) 
+      } else if (command === "b") {
+      } else if (command === "layout") {
+        Promise.all([this.SET_isLogin(false)]);
+        this.$message.success("登出成功!");
+        this.$router.push("/home/article")
+      }
+    },
+    Write(){
+      this.$router.push({ path: '/home/write'}) 
+    },  
+    // setlogin(i){
+    //    this.$store.commit("SET_isLogin(i)")
+    // },
+    ...mapMutations("user", ["SET_isLogin"])
   }
 };
 </script>
@@ -156,6 +199,9 @@ export default {
   margin: auto;
 }
 .right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   float: right;
   /* background-color: #6699FF; */
   margin: auto;

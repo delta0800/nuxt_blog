@@ -9,7 +9,7 @@
       </div>
       <div class="article_info">
         <span class="article_info_date">发表于：{{ item.date }}</span>
-        <!-- <span class="article_info_label"
+        <span class="article_info_label"
           >标签：
           <span v-if="item.labels.length === 0">未分类</span>
           <el-tag
@@ -22,7 +22,7 @@
             :key="index"
             >{{ tag }}</el-tag
           >
-        </span> -->
+        </span>
       </div>
       <div class="article_gist">{{ item.gist }}</div>
       <div @click="articleDetail(item._id)" class="article_button article_all">
@@ -43,23 +43,13 @@ export default {
   },
   async asyncData(context) {
     const { data } = await context.$axios.get("articleList");
-    console.log(data);
-    console.log('123')
     return { articleList: data };
+  },
+  methods: {
+    articleDetail: function(id) {
+      this.$router.push({ path: "articleDetail", query: { id } });
+    }
   }
-  // mounted: function() {
-  //   this.$http.get("/api/articleList").then(
-  //     response => (this.articleList = response.body.reverse()),
-  //     response => console.log(response)
-  //   );
-  // },
-  // methods: {
-  //   articleDetail: function(id) {
-  //     // 这边不能多一个斜杠 '/articleDetail/'  因为router定义的路由是 '/articleDetail:id'
-  //     // 我把router改成 '/articleDetail/:id' 让前后端的路由规则一致
-  //     this.$router.push("/articleDetail/" + id);
-  //   }
-  // }
 };
 </script>
 
