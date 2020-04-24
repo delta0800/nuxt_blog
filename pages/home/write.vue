@@ -103,6 +103,7 @@ export default {
   name: "articleEdit",
   data() {
     return {
+      id: {},
       title: "",
       date: "",
       content: "",
@@ -112,19 +113,16 @@ export default {
       inputValue: ""
     };
   },
-  mounted: function() {
-    if (this.$route.params.id) {
-      this.$http.get("/api/articleDetail/" + this.$route.params.id).then(
-        response => {
-          let article = response.body;
-          this.title = article.title;
-          this.date = article.date;
-          this.content = article.content;
-          this.gist = article.gist;
-          this.labels = article.labels;
-        },
-        response => console.log(response)
-      );
+  mounted: async function() {
+    let id = this.$route.query.id;
+    this.id = id;
+    if (id) {
+      const { data } = await this.$axios.get("articleDetail/" + id);
+      this.title = data.title;
+      this.date = data.date;
+      this.content = data.content;
+      this.gist = data.gist;
+      this.labels = data.labels;
     }
   },
   methods: {
@@ -141,7 +139,7 @@ export default {
       let mydate, y, m, d, hh, mm, ss;
       mydate = new Date();
       y = mydate.getFullYear();
-      m = mydate.getMonth()+1;
+      m = mydate.getMonth() + 1;
       d = mydate.getDate();
       hh = mydate.getHours();
       mm = mydate.getMinutes();
@@ -180,18 +178,18 @@ export default {
         });
         return;
       }
-      if (this.$route.params.id) {
+      if (this.id) {
         // 更新文章
         let obj = {
-          _id: this.$route.params.id,
+          _id: this.id,
           title: this.title,
           date: this.date,
           content: this.content,
           gist: this.gist,
           labels: this.labels
         };
-        this.$http
-          .axios("admin/updateArticle", {
+        this.$axios
+          .post("admin/updateArticle", {
             articleInformation: obj
           })
           .then(
@@ -201,7 +199,7 @@ export default {
                 type: "success"
               });
               // 更新完成后跳转至该文章的详情页
-              self.$router.push("/articleDetail/" + self.$route.params.id);
+              // self.$router.push({ path: "articleDetail",query: { self.id } });
             },
             response => console.log(response)
           );
@@ -270,8 +268,8 @@ h1 {
 .brief_wrap {
   margin-bottom: 1em;
 }
-.markdown_compiled{
-  height:428px;
-  overflow:auto;
+.markdown_compiled {
+  height: 428px;
+  overflow: auto;
 }
 </style>

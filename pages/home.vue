@@ -41,7 +41,7 @@
                 ></el-avatar>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item command="write">写文章</el-dropdown-item>
-                  <el-dropdown-item command="b">管理</el-dropdown-item>
+                  <el-dropdown-item command="mange">管理</el-dropdown-item>
                   <el-dropdown-item command="layout" @click="loginout"
                     >登出</el-dropdown-item
                   >
@@ -133,10 +133,12 @@ export default {
   head() {
     // Set Meta Tags for this Page
   },
+  beforeCreate() {
+    this.$router.replace('/home/article')
+  },
   // and more functionality to discover
   computed: {
     ...mapState("user", {
-      //前面三个 . 不是多余的！！ 第一个参数是模块名称（就是js文件名），后面是{变量名：state => 回调函数 }  这个在后面还会讲一下
       isLogin: state => state.isLogin
     })
   },
@@ -167,7 +169,8 @@ export default {
     handleCommand(command) {
       if (command === "write") {
         this.$router.push({ path: '/home/write'}) 
-      } else if (command === "b") {
+      } else if (command === "mange") {
+        this.$router.push({ path: '/home/articlemanage'})
       } else if (command === "layout") {
         Promise.all([this.SET_isLogin(false)]);
         this.$message.success("登出成功!");
@@ -177,9 +180,6 @@ export default {
     Write(){
       this.$router.push({ path: '/home/write'}) 
     },  
-    // setlogin(i){
-    //    this.$store.commit("SET_isLogin(i)")
-    // },
     ...mapMutations("user", ["SET_isLogin"])
   }
 };

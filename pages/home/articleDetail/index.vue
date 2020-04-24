@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- {{ $route.query }} -->
     <div id="content">
       <div class="article_wrap">
         <div class="article_title article_detail_title">
